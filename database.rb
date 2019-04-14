@@ -14,6 +14,7 @@ class Database
   def set(key, value)
     @db_versions[@tier][key] = value
     @count_versions[@tier][value] += 1
+    return nil
   end
 
   def get(key)
@@ -29,6 +30,7 @@ class Database
     if value
       @db_versions[@tier].delete(key)
       @count_versions[@tier][value] -= 1
+      return nil
     else
       return "That key isn't in the database!"
     end
@@ -40,6 +42,7 @@ class Database
     @db_versions.push(Hash.new())
     @count_versions.push(Hash.new(0))
     @tier += 1
+    return nil
   end
 
   def rollback()
@@ -50,6 +53,7 @@ class Database
     @db_versions.pop
     @count_versions.pop
     @tier -= 1
+    return nil
   end
 
   def commit()
@@ -63,6 +67,7 @@ class Database
     @count_versions.pop
 
     @tier -= 1
+    return nil
   end
 
   def merge_candidate(tier=@tier, merge_item=@db_versions[0])

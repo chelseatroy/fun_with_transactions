@@ -43,12 +43,20 @@ class Database
   end
 
   def rollback()
+    if @tier == 0
+      return "No transaction in progress"
+    end
+    
     @db_versions.pop
     @count_versions.pop
     @tier -= 1
   end
 
   def commit()
+    if @tier == 0
+      return "No transaction in progress"
+    end
+
     @db_versions[-2] = merge_candidate()
     @count_versions[-2] = count_candidate()
     rollback()
@@ -58,7 +66,7 @@ class Database
   def merge_candidate(tier=@tier, merge_item=@db_versions[0])
     if tier == 0
       return merge_item
-    else 
+    else
       step = @db_versions[tier].merge!(merge_item) { |key, canonical_value, transactional_value|
         transactional_value || canonical_value
       }

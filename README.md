@@ -1,13 +1,13 @@
 ## Running Tests
 
-From inside the engineering directory, run `ruby test_database.rb`
+From inside the directory, run `ruby test_database.rb`
 
 ## Using the Database
 
 Two options:
 
 1. Straight from command line (does not work)
-    1. Navigate to 'engineering' directory
+    1. Navigate to directory
     1. Run `sh setup.sh`
     1. type database commands like:
         - SET Hello World
@@ -16,7 +16,7 @@ Two options:
     1. WARNING: I was attempting to replicate exactly the input and output mechanism delineated in the prompt. However, the database does not hold state by this method. I messed with it for about 20 minutes, then decided that you're probably more interested in my database implementation than the exact input mechanism, and I moved on.  
     
 2. Via irb
-    1. Navigate to 'engineering' directory
+    1. Navigate to directory
     1. Type `irb`
     1. Type `load 'database.rb'`
     1. Instantiate database via, for example `db = Database.instance`

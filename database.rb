@@ -3,7 +3,7 @@ require 'singleton'
 class Database
   include Singleton
 
-  attr_accessor :names, :count_versions
+  attr_accessor :names, :count_versions, :tier
 
   def initialize
     @count_versions = [Hash.new(0)]
@@ -55,16 +55,27 @@ class Database
     @tier -= 1
   end
 
-  def merge_candidate()
-    merge_backs = @tier
-
-    if merge_backs == 0
-      return @db_versions[-@tier]
-    else
-      return @db_versions[@tier-1].merge!(@db_versions[@tier]) {
+  def merge_candidate(tier=@tier)
+    if tier == 0
+      return @db_versions[0]
+    end
+    if tier == 1
+      one = @db_versions[@tier-1].merge!(@db_versions[@tier]) {
           |key, canonical_value, transactional_value|
         transactional_value || canonical_value
       }
+      return one
+    end
+    if tier == 2
+      one = @db_versions[@tier-1].merge!(@db_versions[@tier]) {
+          |key, canonical_value, transactional_value|
+        transactional_value || canonical_value
+      }
+     two =  @db_versions[@tier-2].merge!(one) {
+         |key, canonical_value, transactional_value|
+       transactional_value || canonical_value
+     }
+      return two
     end
   end
 

@@ -55,34 +55,26 @@ class Database
     @tier -= 1
   end
 
-  def merge_candidate(tier=@tier)
+  def merge_candidate(tier=@tier, merge_item=@db_versions[0])
     if tier == 0
-      return @db_versions[0]
-    end
-    if tier == 1
-      one = @db_versions[@tier-1].merge!(@db_versions[@tier]) {
-          |key, canonical_value, transactional_value|
+      return merge_item
+    else 
+      step = @db_versions[tier].merge!(merge_item) { |key, canonical_value, transactional_value|
         transactional_value || canonical_value
       }
-      return one
-    end
-    if tier == 2
-      one = @db_versions[@tier-1].merge!(@db_versions[@tier]) {
-          |key, canonical_value, transactional_value|
-        transactional_value || canonical_value
-      }
-     two =  @db_versions[@tier-2].merge!(one) {
-         |key, canonical_value, transactional_value|
-       transactional_value || canonical_value
-     }
-      return two
+      return merge_candidate tier-1, step
     end
   end
 
-  def count_candidate()
-    return @count_versions[@tier-1].merge!(@count_versions[@tier]) {
-        |key, canonical_value, transactional_value| canonical_value + transactional_value
-    }
+  def count_candidate(tier=@tier, merge_item=@count_versions[0])
+    if tier == 0
+      return merge_item
+    else
+      step = @count_versions[tier].merge!(merge_item) { |key, canonical_value, transactional_value|
+        canonical_value + transactional_value
+      }
+      return count_candidate tier-1, step
+    end
   end
 
   def end

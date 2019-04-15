@@ -87,6 +87,27 @@ class TestSimpleNumber < Test::Unit::TestCase
     assert_equal("No transaction in progress", db.rollback)
   end
 
+  def test_transaction_with_deletion
+    db = Database.instance
+
+    db.set "Homing", "Pigeon"
+    db.set "Fantail", "Pigeon"
+
+    assert_equal(2, db.count("Pigeon"))
+
+    db.begin
+
+    db.delete "Fantail"
+
+    assert_equal(1, db.count("Pigeon"))
+    assert_equal("NULL" , db.get("Fantail"))
+
+    db.rollback
+
+    assert_equal(2, db.count("Pigeon"))
+    assert_equal("Pigeon" , db.get("Fantail"))
+  end
+
   def test_nested_transaction
     db = Database.instance
 

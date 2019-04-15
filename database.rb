@@ -6,6 +6,7 @@ class Database
   def initialize
     @count_versions = [Hash.new(0)]
     @db_versions = [Hash.new()]
+    @deletion_keys = [[]]
     @tier = 0
   end
 
@@ -28,6 +29,7 @@ class Database
   def delete(key)
     value = merge_candidate[key]
     if value
+      @deletion_keys[@tier].push(key)
       @db_versions[@tier].delete(key)
       @count_versions[@tier][value] -= 1
       return nil
@@ -41,6 +43,7 @@ class Database
   def begin()
     @db_versions.push(Hash.new())
     @count_versions.push(Hash.new(0))
+    @deletion_keys.push([])
     @tier += 1
     return nil
   end
@@ -52,6 +55,8 @@ class Database
     
     @db_versions.pop
     @count_versions.pop
+    @deletion_keys.pop
+
     @tier -= 1
     return nil
   end
@@ -62,9 +67,12 @@ class Database
     end
 
     @db_versions[-2] = merge_candidate()
+    @deletion_keys[-1].each{|key| @db_versions[-2].delete(key)}
+
     @count_versions[-2] = count_candidate()
     @db_versions.pop
     @count_versions.pop
+    @deletion_keys.pop
 
     @tier -= 1
     return nil
@@ -72,6 +80,7 @@ class Database
 
   def merge_candidate(tier=@tier, merge_item=@db_versions[0])
     if tier == 0
+      @deletion_keys[-1].each{|key| merge_item.delete(key)} if @deletion_keys[-1]
       return merge_item
     else
       step = @db_versions[tier].merge(merge_item) { |key, canonical_value, transactional_value|

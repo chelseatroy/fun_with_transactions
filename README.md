@@ -28,6 +28,8 @@ Here is a screenshot of my irb console demonstrating the database at work:
 
 ![database at work](https://chelseatroy.com/wp-content/uploads/2019/04/Screen-Shot-2019-04-14-at-7.44.44-PM.png)
     
+Here is a screenshot of deletion inside a transaction:
 
-    
+![deletion within transaction](https://chelseatroy.com/wp-content/uploads/2019/04/Screen-Shot-2019-04-14-at-9.15.19-PM.png)
+  
 

@@ -1,8 +1,4 @@
-require 'singleton'
-
 class Database
-  include Singleton
-
   def initialize
     @count_versions = [Hash.new(0)]
     @db_versions = [Hash.new()]
@@ -15,6 +11,7 @@ class Database
   def set(key, value)
     @db_versions[@tier][key] = value
     @count_versions[@tier][value] += 1
+
     return nil
   end
 
@@ -32,10 +29,12 @@ class Database
       @deletion_keys[@tier].push(key)
       @db_versions[@tier].delete(key)
       @count_versions[@tier][value] -= 1
+
       return nil
     else
       return "That key isn't in the database!"
     end
+
   end
 
   #TRANSACTION MANAGEMENT
@@ -45,6 +44,7 @@ class Database
     @count_versions.push(Hash.new(0))
     @deletion_keys.push([])
     @tier += 1
+
     return nil
   end
 
@@ -58,6 +58,7 @@ class Database
     @deletion_keys.pop
 
     @tier -= 1
+
     return nil
   end
 
@@ -75,6 +76,7 @@ class Database
     @deletion_keys.pop
 
     @tier -= 1
+    
     return nil
   end
 

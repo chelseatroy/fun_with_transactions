@@ -11,7 +11,6 @@ class Database
   def set(key, value)
     @db_versions[@tier][key] = value
     @count_versions[@tier][value] += 1
-
     return nil
   end
 
@@ -32,6 +31,7 @@ class Database
 
       return nil
     else
+
       return "That key isn't in the database!"
     end
 
@@ -67,40 +67,17 @@ class Database
       return "No transaction in progress"
     end
 
-    @db_versions[-2] = merge_candidate()
+    @db_versions[-2] = merge_candidate(@tier, @tier-1, @db_versions[0])
     @deletion_keys[-1].each{|key| @db_versions[-2].delete(key)}
 
-    @count_versions[-2] = count_candidate()
+    @count_versions[-2] = count_candidate(@tier, @tier-1, @count_versions[0])
     @db_versions.pop
     @count_versions.pop
     @deletion_keys.pop
 
     @tier -= 1
-    
+
     return nil
-  end
-
-  def merge_candidate(tier=@tier, merge_item=@db_versions[0])
-    if tier == 0
-      @deletion_keys[-1].each{|key| merge_item.delete(key)} if @deletion_keys[-1]
-      return merge_item
-    else
-      step = @db_versions[tier].merge(merge_item) { |key, canonical_value, transactional_value|
-        transactional_value || canonical_value
-      }
-      return merge_candidate tier-1, step
-    end
-  end
-
-  def count_candidate(tier=@tier, merge_item=@count_versions[0])
-    if tier == 0
-      return merge_item
-    else
-      step = @count_versions[tier].merge(merge_item) { |key, canonical_value, transactional_value|
-        canonical_value + transactional_value
-      }
-      return count_candidate tier-1, step
-    end
   end
 
   #END THE CONSOLE SESSION
@@ -108,4 +85,30 @@ class Database
   def end
     exit()
   end
+
+  private
+
+  def merge_candidate(start_tier=@tier, end_tier=0, merge_item=@db_versions[end_tier])
+    if start_tier == end_tier
+      @deletion_keys[-1].each{|key| merge_item.delete(key)} if @deletion_keys[-1]
+      return merge_item
+    else
+      step = @db_versions[start_tier].merge(merge_item) { |key, canonical_value, transactional_value|
+        transactional_value || canonical_value
+      }
+      return merge_candidate start_tier-1, end_tier,step
+    end
+  end
+
+  def count_candidate(start_tier=@tier, end_tier=0, merge_item=@count_versions[0])
+    if start_tier == end_tier
+      return merge_item
+    else
+      step = @count_versions[start_tier].merge(merge_item) { |key, canonical_value, transactional_value|
+        canonical_value + transactional_value
+      }
+      return count_candidate start_tier-1, end_tier,step
+    end
+  end
+
 end

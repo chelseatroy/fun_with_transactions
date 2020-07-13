@@ -13,7 +13,7 @@ Two options:
         - SET Hello World
         - GET Hello
         - DELETE Hello
-    1. WARNING: I was attempting to replicate exactly the input and output mechanism delineated in the prompt. However, the database does not hold state by this method. I messed with it for about 20 minutes, then decided that you're probably more interested in my database implementation than the exact input mechanism, and I moved on.  
+    1. WARNING: I was attempting, with this maneuver, to replicate exactly the input and output mechanism delineated in the prompt. However, the database does not hold state by this method. I messed with it for about 20 minutes, then decided that you're probably more interested in my database implementation than the exact input mechanism, and I moved on.  
     
 2. Via irb
     1. Navigate to directory
